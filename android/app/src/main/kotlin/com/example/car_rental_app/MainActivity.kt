@@ -1,5 +1,6 @@
-package com.example.car_rental_app
+package com.nikkhilpareek.ryder
 
 import io.flutter.embedding.android.FlutterActivity
 
-class MainActivity: FlutterActivity()
+class MainActivity: FlutterActivity() {
+}

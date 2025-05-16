@@ -1,16 +1,22 @@
 buildscript {
-    ext.kotlin_version = '1.9.0'
+    ext.kotlin_version = '2.1.21'
     repositories {
         google()
         mavenCentral()
     }
 
     dependencies {
-        // Update AGP version to at least 7.3.1
-        classpath 'com.android.tools.build:gradle:7.4.2'
+        classpath 'com.android.tools.build:gradle:8.3.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath 'com.google.gms:google-services:4.4.0'
     }
+}
+
+plugins {
+    id "com.android.application" apply false
+    id "com.google.gms.google-services" apply false
+    id "kotlin-android" apply false
+    id "dev.flutter.flutter-gradle-plugin" apply false
 }
 
 allprojects {
@@ -30,53 +36,4 @@ subprojects {
 
 tasks.register("clean", Delete) {
     delete rootProject.buildDir
-}
-
-plugins {
-    id "com.android.application"
-    id "com.google.gms.google-services"
-    id "kotlin-android"
-    id "dev.flutter.flutter-gradle-plugin"
-}
-
-android {
-    namespace = "com.nikkhilpareek.ryder"
-    compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
-
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8
-    }
-
-    defaultConfig {
-        applicationId = "com.nikkhilpareek.ryder"
-        minSdk = 23  // Updated to 23 for Firebase Auth compatibility
-        targetSdk = flutter.targetSdkVersion
-        versionCode = flutter.versionCode
-        versionName = flutter.versionName
-    }
-
-    buildTypes {
-        release {
-            signingConfig = signingConfigs.debug
-        }
-    }
-}
-
-flutter {
-    source = "../.."
-}
-
-dependencies {
-    // Use the Firebase BoM
-    implementation platform('com.google.firebase:firebase-bom:33.13.0')
-
-    // Firebase dependencies
-    implementation 'com.google.firebase:firebase-analytics'
-    implementation 'com.google.firebase:firebase-auth'
 }
