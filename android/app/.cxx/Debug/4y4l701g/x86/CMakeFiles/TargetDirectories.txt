@@ -1,2 +1,0 @@
-/home/deepak/Desktop/car_rental_app/android/app/.cxx/Debug/4y4l701g/x86/CMakeFiles/edit_cache.dir
-/home/deepak/Desktop/car_rental_app/android/app/.cxx/Debug/4y4l701g/x86/CMakeFiles/rebuild_cache.dir

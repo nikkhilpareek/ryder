@@ -1,80 +1,61 @@
-import 'package:car_rental_app/features/add_car/repository/add_car_repository_impl.dart';
-import 'package:car_rental_app/features/add_car/view_model/add_car_view_model.dart';
-import 'package:car_rental_app/features/bookings/repository/booking_repository_impl.dart';
-import 'package:car_rental_app/features/bookings/view_model/bookin_view_model.dart';
-import 'package:car_rental_app/features/cars/repository/car_repository_impl.dart';
-import 'package:car_rental_app/features/cars/view_model/cars_view_model.dart';
-import 'package:car_rental_app/features/login/repository/login_repository_impl.dart';
-import 'package:car_rental_app/features/login/view_model/login_view_model.dart';
-import 'package:car_rental_app/features/signup/repository/sign_up_repository_impl.dart';
-import 'package:car_rental_app/features/signup/view_model/sign_up_view_model.dart';
-import 'package:car_rental_app/routes/routes.dart';
+import 'package:car_rental_app/firebase_options.dart';
+import 'package:car_rental_app/injection_container.dart';
+import 'package:car_rental_app/presentation/bloc/bloc/car_bloc.dart';
+import 'package:car_rental_app/presentation/bloc/bloc/car_event.dart';
+import 'package:car_rental_app/presentation/pages/onboarding_page.dart';
+import 'package:device_preview/device_preview.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
-void main() {
-    configLoading();
-  runApp(const MyApp());
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-}
+// Global navigator key for navigation from anywhere
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
-void configLoading() {
-  EasyLoading.instance
-    ..indicatorType = EasyLoadingIndicatorType.circle
-    ..loadingStyle = EasyLoadingStyle.dark
-    ..maskType = EasyLoadingMaskType.black
-    ..indicatorSize = 45.0
-    ..radius = 10.0;
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  initInjection();
+  runApp(
+    DevicePreview(
+      enabled: !kReleaseMode,
+      builder: (context) => const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(
-            create: (_) => CarsViewModel(repository: CarRepositoryImpl())),
-        ChangeNotifierProvider(
-            create: (_) => SignUpViewModel(repository: SignUpRepositoryImpl())),
-        ChangeNotifierProvider(
-            create: (_) => LoginViewModel(repository: LoginRepositoryImpl())),
-
-        ChangeNotifierProvider(
-            create: (_) => AddCarViewModel(repository: AddCarRepositoryImpl())),
-        ChangeNotifierProvider(
-            create: (_) =>
-                BookingViewModel(repository: BookingRepositoryImpl())),
-
-      ],
-     
-      child: MaterialApp.router(
-        title: 'Flutter Demo',
-        theme: ThemeData(
-          // This is the theme of your application.
-          //
-          // TRY THIS: Try running your application with "flutter run". You'll see
-          // the application has a purple toolbar. Then, without quitting the app,
-          // try changing the seedColor in the colorScheme below to Colors.green
-          // and then invoke "hot reload" (save your changes or press the "hot
-          // reload" button in a Flutter-supported IDE, or press "r" if you used
-          // the command line to start the app).
-          //
-          // Notice that the counter didn't reset back to zero; the application
-          // state is not lost during the reload. To reset the state, use hot
-          // restart instead.
-          //
-          // This works for code too, not just values: Most code changes can be
-          // tested with just a hot reload.
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+    return BlocProvider(
+      create: (_) => getIt<CarBloc>()..add(LoadCars()),
+      child: MaterialApp(
+        navigatorKey: navigatorKey,
+        // ignore: deprecated_member_use
+        useInheritedMediaQuery: true,
+        locale: DevicePreview.locale(context),
+        builder: DevicePreview.appBuilder,
+        debugShowCheckedModeBanner: false,
+        title: 'Car Rental App',
+        theme: ThemeData.dark().copyWith(
+          // ignore: deprecated_member_use
           useMaterial3: true,
-          
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: Colors.deepPurple,
+            brightness: Brightness.dark,
+          ),
+          scaffoldBackgroundColor: const Color(0xFF121212),
+          appBarTheme: const AppBarTheme(
+            backgroundColor: Color(0xFF1E1E1E),
+            elevation: 0,
+          ),
         ),
-        routerConfig: AppRouter.router,
-         builder: EasyLoading.init(),
-        
+        // Always start with the onboarding page regardless of auth state
+        home: const OnboardingPage(),
       ),
     );
   }
