@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:car_rental_app/data/models/car.dart';
+import 'package:car_rental_app/presentation/pages/booking_page.dart';
 import 'package:car_rental_app/presentation/pages/maps_detail_page.dart';
 import 'package:car_rental_app/presentation/widgets/car_card.dart';
 import 'package:car_rental_app/presentation/widgets/more_card.dart';
@@ -37,6 +38,27 @@ class _CarDetailsPageState extends State<CarDetailsPage>
   void dispose() {
     _controller!.dispose();
     super.dispose();
+  }
+
+  // Helper function to get car image path - matches the one in maps_detail_page.dart
+  String getCarImagePath(String model) {
+    // Convert model name to lowercase for case-insensitive comparison
+    final modelLower = model.toLowerCase();
+    
+    if (modelLower.contains('creta')) {
+      return 'assets/creta.webp';
+    } else if (modelLower.contains('civic')) {
+      return 'assets/civic.png';
+    } else if (modelLower.contains('corolla')) {
+      return 'assets/corolla.png';
+    } else if (modelLower.contains('fortuner')) {
+      return 'assets/fortuner.png';
+    } else if (modelLower.contains('harrier')) {
+      return 'assets/harrier.webp';
+    } 
+    
+    // Default image if no match found
+    return 'assets/car_image.png';
   }
 
   Widget _glassContainer({required Widget child}) {
@@ -111,6 +133,36 @@ class _CarDetailsPageState extends State<CarDetailsPage>
                             style: TextStyle(
                               color: Colors.white70,
                               fontSize: 12,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          // Add Book Now button with corrected parameters
+                          ElevatedButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => BookingPage(
+                                    carName: widget.car.model,
+                                    pricePerDay: widget.car.pricePerHour * 10,
+                                    carImage: getCarImagePath(widget.car.model),
+                                  ),
+                                ),
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.deepPurple,
+                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            child: const Text(
+                              'Book Now',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                         ],

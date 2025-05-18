@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 
+import 'package:car_rental_app/presentation/pages/booking_page.dart';
+
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 class MapsDetailPage extends StatelessWidget {
@@ -81,7 +83,7 @@ class MapsDetailPage extends StatelessWidget {
             ],
           ),
           Positioned(
-              bottom: 0, left: 0, right: 0, child: carDetailsCard(car: car, getCarImagePath: _getCarImagePath)),
+              bottom: 0, left: 0, right: 0, child: carDetailsCard(context: context, car: car, getCarImagePath: _getCarImagePath)),
         ],
       ),
     );
@@ -89,6 +91,7 @@ class MapsDetailPage extends StatelessWidget {
 }
 
 Widget carDetailsCard({
+  required BuildContext context,
   required Car car,
   required String Function(String) getCarImagePath,
 }) {
@@ -217,22 +220,18 @@ Widget carDetailsCard({
                             SizedBox(height: 5),
                             ElevatedButton(
                               onPressed: () {
-                                showBookingDialog(car);
+Navigator.push(
+  context,
+  MaterialPageRoute(
+    builder: (context) => BookingPage(
+      carName: car.model,
+      pricePerDay: car.pricePerHour * 10,
+      carImage: getCarImagePath(car.model),
+    ),
+  ),
+);
                               },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Color(0xFF1F1F2E),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                shadowColor: Colors.purple.withOpacity(0.4),
-                                elevation: 10,
-                              ),
-                              child: Text(
-                                'Book Now',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                ),
-                              ),
+                              child: const Text('Book Now'),
                             ),
                           ],
                         ),

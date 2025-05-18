@@ -15,6 +15,8 @@ class CarCard extends StatelessWidget {
     if (modelLower.contains('corolla')) return 'assets/corolla.png';
     if (modelLower.contains('fortuner')) return 'assets/fortuner.png';
     if (modelLower.contains('harrier')) return 'assets/harrier.webp';
+    if (modelLower.contains('swift')) return 'assets/maruti suzuki swift.png';
+    if (modelLower.contains('xuv')) return 'assets/mahindra xuv 300.webp';
     return 'assets/car_image.png';
   }
 

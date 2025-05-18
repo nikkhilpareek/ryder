@@ -45,14 +45,22 @@ dependencies:
   device_preview: ^1.2.0
   firebase_auth: ^4.16.0
   google_sign_in: ^6.3.0
-  url_launcher: ^6.3.1
   image_picker: ^1.1.2
   firebase_storage: ^11.6.5
+  flutter_launcher_icons: ^0.14.3
+  rename_app: ^1.6.3
+  url_launcher: ^6.3.1
   
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/ryder.png"
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
