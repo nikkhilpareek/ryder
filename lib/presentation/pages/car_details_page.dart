@@ -56,6 +56,9 @@ class _CarDetailsPageState extends State<CarDetailsPage>
     } else if (modelLower.contains('harrier')) {
       return 'assets/harrier.webp';
     } 
+    else if (modelLower.contains('maybach')) {
+      return 'assets/maybach gls 600.webp';
+    } 
     
     // Default image if no match found
     return 'assets/car_image.png';

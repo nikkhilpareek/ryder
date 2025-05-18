@@ -433,6 +433,8 @@ class _CarListScreenState extends State<CarListScreen> {
       return 'assets/mahindra xuv 300.webp';
     } else if (modelLower.contains('swift')) {
       return 'assets/maruti suzuki swift.png';
+    } else if (modelLower.contains('maybach')) {
+      return 'assets/maybach gls 600.webp';
     }
     
     // Default image if no match found

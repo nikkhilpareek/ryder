@@ -38,6 +38,9 @@ class MapsDetailPage extends StatelessWidget {
     else if (modelLower.contains('swift')) {
       return 'assets/maruti suzuki swift.png';
     }
+    else if (modelLower.contains('maybach')) {
+      return 'assets/maybach gls 600.webp';
+    }
     // else if (modelLower.contains('ferrari')) {
     //   return 'assets/ferrari_car.png';
     // } else if (modelLower.contains('lamborghini')) {

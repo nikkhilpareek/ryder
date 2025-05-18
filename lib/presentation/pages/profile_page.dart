@@ -10,6 +10,8 @@ import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -37,6 +39,17 @@ class _ProfilePageState extends State<ProfilePage> {
   Future<void> getUserData() async {
     try {
       if (user != null) {
+        // Try to load from SharedPreferences first
+        final prefs = await SharedPreferences.getInstance();
+        final localImagePath = prefs.getString('profile_image_path');
+        
+        if (localImagePath != null && File(localImagePath).existsSync()) {
+          setState(() {
+            profileImageUrl = 'file://$localImagePath';
+          });
+        }
+        
+        // Still get user data from Firestore for name and email
         final userData = await FirebaseFirestore.instance
             .collection('users')
             .doc(user!.uid)
@@ -49,7 +62,22 @@ class _ProfilePageState extends State<ProfilePage> {
             userName = data['name'] ?? 'User';
             nameController.text = userName;
             email = data['email'] ?? user!.email ?? 'No email';
-            profileImageUrl = data['profileImageUrl'];
+            
+            // Only update image from Firestore if we don't have a local one
+            if (profileImageUrl == null) {
+              final firestoreImgUrl = data['profileImageUrl'];
+              if (firestoreImgUrl != null && firestoreImgUrl.startsWith('local:')) {
+                // This is a local file reference from Firestore
+                final localPath = firestoreImgUrl.substring(6); // Remove 'local:' prefix
+                if (File(localPath).existsSync()) {
+                  profileImageUrl = 'file://$localPath';
+                }
+              } else if (firestoreImgUrl != null) {
+                // This is a regular URL
+                profileImageUrl = firestoreImgUrl;
+              }
+            }
+            
             isLoading = false;
           });
         } else {
@@ -339,7 +367,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 // Add developer information in frosted glass container
                 const SizedBox(height: 40),
                 const Text(
-                  'Developer',
+                  'Development Team',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.white,
@@ -350,7 +378,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 
                 const SizedBox(height: 16),
                 
-                // Frosted glass container for developer info
+                // First developer (existing one)
                 ClipRRect(
                   borderRadius: BorderRadius.circular(16),
                   child: BackdropFilter(
@@ -483,6 +511,232 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                 ),
                 
+                // Add spacing between developers
+                const SizedBox(height: 16),
+                
+                // Second developer (updated for Deepak)
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                    child: Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.08),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: Colors.white.withOpacity(0.2)),
+                      ),
+                      child: Row(
+                        children: [
+                          // Developer image - using Deepak's image from assets
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: Image.asset(
+                              'assets/deepak.jpeg', // Use Deepak's image from assets
+                              width: 80,
+                              height: 80,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                // Fallback if image doesn't load
+                                return Container(
+                                  width: 80,
+                                  height: 80,
+                                  color: Colors.deepPurple.withOpacity(0.3),
+                                  child: const Icon(Icons.person, color: Colors.white, size: 40),
+                                );
+                              },
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          
+                          // Developer name and social links
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'Deepak Vishwakarma', // Updated name
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                
+                                // Social media links
+                                Row(
+                                  children: [
+                                    // GitHub link
+                                    GestureDetector(
+                                      onTap: () async {
+                                        // Replace with Deepak's actual GitHub URL
+                                        final Uri url = Uri.parse('https://github.com/deepak-vm');
+                                        if (await canLaunchUrl(url)) {
+                                          await launchUrl(url, mode: LaunchMode.externalApplication);
+                                        }
+                                      },
+                                      child: Container(
+                                        padding: const EdgeInsets.all(8),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white.withOpacity(0.1),
+                                          borderRadius: BorderRadius.circular(8),
+                                        ),
+                                        child: Image.asset(
+                                          'assets/github.png',
+                                          width: 24,
+                                          height: 24,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    
+                                    // LinkedIn link
+                                    GestureDetector(
+                                      onTap: () async {
+                                        // Replace with Deepak's actual LinkedIn URL
+                                        final Uri url = Uri.parse('https://www.linkedin.com/in/deepakvi18');
+                                        if (await canLaunchUrl(url)) {
+                                          await launchUrl(url, mode: LaunchMode.externalApplication);
+                                        }
+                                      },
+                                      child: Container(
+                                        padding: const EdgeInsets.all(8),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white.withOpacity(0.1),
+                                          borderRadius: BorderRadius.circular(8),
+                                        ),
+                                        child: Image.asset(
+                                          'assets/linkedin.webp',
+                                          width: 24,
+                                          height: 24,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    
+                                    // Instagram link
+                                    GestureDetector(
+                                      onTap: () async {
+                                        // Replace with Deepak's actual Instagram URL
+                                        final Uri url = Uri.parse('https://www.instagram.com/vdeepak_');
+                                        if (await canLaunchUrl(url)) {
+                                          await launchUrl(url, mode: LaunchMode.externalApplication);
+                                        }
+                                      },
+                                      child: Container(
+                                        padding: const EdgeInsets.all(8),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white.withOpacity(0.1),
+                                          borderRadius: BorderRadius.circular(8),
+                                        ),
+                                        child: Image.asset(
+                                          'assets/ig.webp',
+                                          width: 24,
+                                          height: 24,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                
+                // Add spacing between developers
+                const SizedBox(height: 16),
+                
+                // Third developer (updated for Riyansh)
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                    child: Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.08),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: Colors.white.withOpacity(0.2)),
+                      ),
+                      child: Row(
+                        children: [
+                          // Developer image - using Riyansh's image from assets
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: Image.asset(
+                              'assets/riyansh.png', // Use Riyansh's image from assets
+                              width: 80,
+                              height: 80,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                // Fallback if image doesn't load
+                                return Container(
+                                  width: 80,
+                                  height: 80,
+                                  color: Colors.blue.withOpacity(0.3),
+                                  child: const Icon(Icons.person, color: Colors.white, size: 40),
+                                );
+                              },
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          
+                          // Developer name and social links
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'Riyansh Verma', // Updated name
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                
+                                // Social media links
+                                Row(
+                                  children: [
+                                    // Instagram link only
+                                    GestureDetector(
+                                      onTap: () async {
+                                        // Replace with Riyansh's actual Instagram URL
+                                        final Uri url = Uri.parse('https://www.github.com/riyanshverma');
+                                        if (await canLaunchUrl(url)) {
+                                          await launchUrl(url, mode: LaunchMode.externalApplication);
+                                        }
+                                      },
+                                      child: Container(
+                                        padding: const EdgeInsets.all(8),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white.withOpacity(0.1),
+                                          borderRadius: BorderRadius.circular(8),
+                                        ),
+                                        child: Image.asset(
+                                          'assets/github.png',
+                                          width: 24,
+                                          height: 24,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                
                 const SizedBox(height: 30),
                 Text(
                   'Version 1.0.0',
@@ -513,43 +767,89 @@ class _ProfilePageState extends State<ProfilePage> {
         isUploadingImage = true;
       });
       
-      final String fileName = path.basename(pickedFile.path);
-      final File imageFile = File(pickedFile.path);
+      // Get local app directory for storing files
+      final appDir = await getApplicationDocumentsDirectory();
       
-      // Upload to Firebase Storage
-      final storageRef = FirebaseStorage.instance
-          .ref()
-          .child('profile_images')
-          .child(user!.uid)
-          .child(fileName);
+      // Use a timestamp to ensure uniqueness and prevent caching issues
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+      final fileName = 'profile_${user!.uid}_$timestamp.jpg';
+      final savedImage = File('${appDir.path}/$fileName');
       
-      final uploadTask = storageRef.putFile(imageFile);
-      final snapshot = await uploadTask.whenComplete(() {});
-      final downloadUrl = await snapshot.ref.getDownloadURL();
+      // Delete any existing profile images for this user
+      final directory = Directory(appDir.path);
+      await for (var entity in directory.list()) {
+        if (entity is File && 
+            path.basename(entity.path).startsWith('profile_${user!.uid}')) {
+          try {
+            await entity.delete();
+          } catch (e) {
+            print('Error deleting old profile image: $e');
+          }
+        }
+      }
       
-      // Save URL to Firestore
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user!.uid)
-          .update({
-        'profileImageUrl': downloadUrl,
-      });
+      // Copy the picked image to our app directory
+      await File(pickedFile.path).copy(savedImage.path);
       
+      // Store the path in SharedPreferences
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('profile_image_path', savedImage.path);
+      
+      // Also update in Firestore just the reference (not the actual image)
+      try {
+        final userDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user!.uid)
+            .get();
+    
+        if (userDoc.exists) {
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(user!.uid)
+              .update({
+            'profileImageUrl': 'local:${savedImage.path}',
+            'profileImageUpdatedAt': timestamp, // Add timestamp to track updates
+          });
+        } else {
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(user!.uid)
+              .set({
+            'name': userName,
+            'email': email,
+            'profileImageUrl': 'local:${savedImage.path}',
+            'profileImageUpdatedAt': timestamp, // Add timestamp to track updates
+            'createdAt': FieldValue.serverTimestamp(),
+          });
+        }
+      } catch (e) {
+        // If Firestore update fails, we still have the local image
+        print('Firestore update failed, but image saved locally: $e');
+      }
+      
+      // Use a cache-busting parameter with the file path to avoid image caching
       setState(() {
-        profileImageUrl = downloadUrl;
+        // Add the timestamp as a cache busting parameter
+        profileImageUrl = 'file://${savedImage.path}?t=$timestamp';
         isUploadingImage = false;
       });
       
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Profile picture updated successfully!')),
+        const SnackBar(
+          content: Text('Profile picture updated successfully!'),
+          backgroundColor: Colors.green,
+        ),
       );
     } catch (e) {
       setState(() {
         isUploadingImage = false;
       });
-      print('Error picking/uploading image: $e');
+      print('Error picking/saving image: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error updating profile picture: $e')),
+        SnackBar(
+          content: Text('Error updating profile picture: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
       );
     }
   }
@@ -623,20 +923,24 @@ class _ProfilePageState extends State<ProfilePage> {
                                   ),
                                   image: profileImageUrl != null
                                       ? DecorationImage(
-                                          image: NetworkImage(profileImageUrl!),
+                                          image: profileImageUrl!.startsWith('file://')
+                                              ? FileImage(File(profileImageUrl!.split('?').first.substring(7))) // Remove 'file://' prefix and any query params
+                                              : NetworkImage(profileImageUrl!) as ImageProvider,
                                           fit: BoxFit.cover,
                                         )
                                       : null,
                                 ),
-                                child: profileImageUrl == null
-                                    ? const Center(
-                                        child: Icon(
-                                          Icons.person,
-                                          size: 60,
-                                          color: Colors.white,
-                                        ),
-                                      )
-                                    : null,
+                                child: isUploadingImage 
+                                    ? const CircularProgressIndicator()
+                                    : profileImageUrl == null
+                                        ? const Center(
+                                            child: Icon(
+                                              Icons.person,
+                                              size: 60,
+                                              color: Colors.white,
+                                            ),
+                                          )
+                                        : null,
                               ),
                               if (isUploadingImage)
                                 Positioned.fill(

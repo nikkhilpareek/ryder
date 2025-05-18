@@ -50,6 +50,8 @@ dependencies:
   flutter_launcher_icons: ^0.14.3
   rename_app: ^1.6.3
   url_launcher: ^6.3.1
+  shared_preferences: ^2.5.3
+  path_provider: ^2.1.5
   
 
 dev_dependencies:
