@@ -86,6 +86,23 @@ class _CarDetailsPageState extends State<CarDetailsPage>
     );
   }
 
+  Color _getCategoryColor(String category) {
+    switch (category.toLowerCase()) {
+      case 'suv':
+        return Colors.blue;
+      case 'sedan':
+        return Colors.green;
+      case 'hatchback':
+        return Colors.orange;
+      case 'luxury':
+        return Colors.purple;
+      case 'electric':
+        return Colors.teal;
+      default:
+        return Colors.deepPurple;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -146,6 +163,7 @@ class _CarDetailsPageState extends State<CarDetailsPage>
                                     carName: widget.car.model,
                                     pricePerDay: widget.car.pricePerHour * 10,
                                     carImage: getCarImagePath(widget.car.model),
+                                    category: widget.car.category, // Add this line
                                   ),
                                 ),
                               );

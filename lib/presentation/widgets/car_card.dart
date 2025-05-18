@@ -20,6 +20,23 @@ class CarCard extends StatelessWidget {
     return 'assets/car_image.png';
   }
 
+  Color _getCategoryColor(String category) {
+    switch (category.toLowerCase()) {
+      case 'suv':
+        return Colors.blue;
+      case 'sedan':
+        return Colors.green;
+      case 'hatchback':
+        return Colors.orange;
+      case 'luxury':
+        return Colors.purple;
+      case 'electric':
+        return Colors.teal;
+      default:
+        return Colors.deepPurple;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -31,81 +48,152 @@ class CarCard extends StatelessWidget {
           ),
         );
       },
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 15.0, sigmaY: 15.0),
-          child: Container(
-            margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.05),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: Colors.white.withOpacity(0.2),
-              ),
-              boxShadow: const [
-                BoxShadow(
-                  color: Colors.black26,
-                  blurRadius: 20,
-                  offset: Offset(0, 8),
-                ),
-              ],
-            ),
-            child: Column(
-              children: [
-                Image.asset(
-                  _getCarImagePath(car.model),
-                  height: 120,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Image.asset('assets/car_image.png', height: 120);
-                  },
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  car.model,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w900,
-                    fontSize: 20,
-                    color: Colors.white,
+      child: Stack(
+        children: [
+          // Main Card
+          ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 15.0, sigmaY: 15.0),
+              child: Container(
+                margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.05),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: Colors.white.withOpacity(0.2),
                   ),
-                ),
-                const SizedBox(height: 10),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        Image.asset('assets/gps.png', height: 16, color: Colors.white70),
-                        const SizedBox(width: 4),
-                        Text(
-                          '${car.distance.toStringAsFixed(0)}km',
-                          style: const TextStyle(color: Colors.white70),
-                        ),
-                        const SizedBox(width: 10),
-                        Image.asset('assets/pump.png', height: 16, color: Colors.white70),
-                        const SizedBox(width: 4),
-                        Text(
-                          '${car.fuelCapacity.toStringAsFixed(0)}L',
-                          style: const TextStyle(color: Colors.white70),
-                        ),
-                      ],
-                    ),
-                    Text(
-                      'Rs. ${car.pricePerHour.toStringAsFixed(2)}/h',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Colors.black26,
+                      blurRadius: 20,
+                      offset: Offset(0, 8),
                     ),
                   ],
                 ),
-              ],
+                child: Column(
+                  children: [
+                    // Car image
+                    Image.asset(
+                      _getCarImagePath(car.model),
+                      height: 120,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Image.asset('assets/car_image.png', height: 120);
+                      },
+                    ),
+                    
+                    // Car details
+                    const SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          car.model,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                        // Price section
+                        RichText(
+                          text: TextSpan(
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: Colors.white,
+                            ),
+                            children: [
+                              TextSpan(
+                                text: 'Rs. ${car.pricePerHour.toStringAsFixed(0)}',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              const TextSpan(
+                                text: '/hr',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 15),
+                    // Car features
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        // Distance feature
+                        buildFeature(
+                          icon: Icons.speed,
+                          value: '${car.distance.toStringAsFixed(0)} km',
+                        ),
+                        // Fuel capacity feature
+                        buildFeature(
+                          icon: Icons.local_gas_station,
+                          value: '${car.fuelCapacity.toStringAsFixed(0)} L',
+                        ),
+                        // Rating feature
+                        buildFeature(
+                          icon: Icons.star,
+                          value: '4.8',
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
-        ),
+          
+          // Category badge - positioned relative to the entire card
+          Positioned(
+            top: 5, // Adjusted for proper positioning
+            right: 25, // Adjusted to account for card margin
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: _getCategoryColor(car.category).withOpacity(0.3),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.white.withOpacity(0.1)),
+                  ),
+                  child: Text(
+                    car.category,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
+    );
+  }
+
+  Widget buildFeature({required IconData icon, required String value}) {
+    return Row(
+      children: [
+        Icon(icon, size: 16, color: Colors.white70),
+        const SizedBox(width: 4),
+        Text(
+          value,
+          style: const TextStyle(color: Colors.white70),
+        ),
+      ],
     );
   }
 }

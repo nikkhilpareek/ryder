@@ -1,14 +1,16 @@
 class Car {
   final String model;
   final double distance;
-  final double fuelCapacity;  // Changed from fuelcapacity
-  final double pricePerHour;  // Changed from pricehr
+  final double fuelCapacity;
+  final double pricePerHour;
+  final String category; // New field
 
   Car({
     required this.model,
     required this.distance,
-    required this.fuelCapacity,  // Changed from fuelcapacity
-    required this.pricePerHour,  // Changed from pricehr
+    required this.fuelCapacity,
+    required this.pricePerHour,
+    this.category = 'Sedan', // Default category
   });
 
   factory Car.fromMap(Map<String, dynamic> map) {
@@ -23,16 +25,18 @@ class Car {
       pricePerHour: map['pricePerHour'] != null 
           ? (map['pricePerHour']).toDouble() 
           : (map['pricehr'] ?? 0).toDouble(),
+      // Add category from Firestore
+      category: map['category'] ?? 'Sedan',
     );
   }
   
-  // Add toMap method for sending data back to Firebase
   Map<String, dynamic> toMap() {
     return {
       'model': model,
       'distance': distance,
       'fuelCapacity': fuelCapacity,
       'pricePerHour': pricePerHour,
+      'category': category,
     };
   }
 }

@@ -135,15 +135,44 @@ Widget carDetailsCard({
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    car.model,
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          car.model,
+                          style: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(15),
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: _getCategoryColor(car.category).withOpacity(0.3),
+                              borderRadius: BorderRadius.circular(15),
+                              border: Border.all(color: Colors.white.withOpacity(0.1)),
+                            ),
+                            child: Text(
+                              car.category,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   Row(
                     children: [
                       Icon(Icons.directions_car, color: Colors.white, size: 16),
@@ -233,6 +262,7 @@ Navigator.push(
       carName: car.model,
       pricePerDay: car.pricePerHour * 10,
       carImage: getCarImagePath(car.model),
+      category: car.category, // Add this line
     ),
   ),
 );
@@ -873,4 +903,22 @@ String calculateTotalPrice(double hourlyRate, int hours) {
   }
   
   return totalPrice.toStringAsFixed(2);
+}
+
+// Add helper method at the end of the file
+Color _getCategoryColor(String category) {
+  switch (category.toLowerCase()) {
+    case 'suv':
+      return Colors.blue;
+    case 'sedan':
+      return Colors.green;
+    case 'hatchback':
+      return Colors.orange;
+    case 'luxury':
+      return Colors.purple;
+    case 'electric':
+      return Colors.teal;
+    default:
+      return Colors.deepPurple;
+  }
 }

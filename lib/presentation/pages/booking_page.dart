@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:ui';
 
 class BookingPage extends StatefulWidget {
   final String? carId;
   final String? carName;
   final double? pricePerDay;
   final String? carImage;
+  final String? category; // New parameter
 
   const BookingPage({
     super.key, 
@@ -13,6 +17,7 @@ class BookingPage extends StatefulWidget {
     this.carName = 'Selected Car',
     this.pricePerDay = 2500.0, // Default price in INR
     this.carImage,
+    this.category = 'Sedan', // Default category
   });
 
   @override
@@ -157,6 +162,24 @@ class _BookingPageState extends State<BookingPage> {
     }
   }
 
+  // Add the helper method for category colors
+  Color _getCategoryColor(String category) {
+    switch (category.toLowerCase()) {
+      case 'suv':
+        return Colors.blue;
+      case 'sedan':
+        return Colors.green;
+      case 'hatchback':
+        return Colors.orange;
+      case 'luxury':
+        return Colors.purple;
+      case 'electric':
+        return Colors.teal;
+      default:
+        return Colors.deepPurple;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -212,6 +235,31 @@ class _BookingPageState extends State<BookingPage> {
                             style: Theme.of(context).textTheme.titleMedium,
                           ),
                           const SizedBox(height: 4),
+                          // Add the category badge here
+                          if (widget.category != null)
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: BackdropFilter(
+                                filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+                                child: Container(
+                                  margin: const EdgeInsets.only(bottom: 6),
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: _getCategoryColor(widget.category!).withOpacity(0.3),
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(color: Colors.white.withOpacity(0.1)),
+                                  ),
+                                  child: Text(
+                                    widget.category!,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
                           Text(
                             '${rupeeFormat.format(widget.pricePerDay ?? 0)} per day',
                             style: Theme.of(context).textTheme.bodyLarge,
