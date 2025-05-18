@@ -32,6 +32,12 @@ class MapsDetailPage extends StatelessWidget {
     else if (modelLower.contains('harrier')) {
       return 'assets/harrier.webp';
     } 
+    else if (modelLower.contains('xuv')) {
+      return 'assets/mahindra xuv 300.webp';
+    }
+    else if (modelLower.contains('swift')) {
+      return 'assets/maruti suzuki swift.png';
+    }
     // else if (modelLower.contains('ferrari')) {
     //   return 'assets/ferrari_car.png';
     // } else if (modelLower.contains('lamborghini')) {
