@@ -3,6 +3,7 @@ import 'package:car_rental_app/injection_container.dart';
 import 'package:car_rental_app/presentation/bloc/bloc/car_bloc.dart';
 import 'package:car_rental_app/presentation/bloc/bloc/car_event.dart';
 import 'package:car_rental_app/presentation/pages/onboarding_page.dart';
+import 'package:device_preview/device_preview.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -16,7 +17,12 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   initInjection();
-  runApp(const MyApp());
+  runApp(
+    DevicePreview(
+      enabled: true, // Enable for web demo
+      builder: (context) => const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -27,6 +33,9 @@ class MyApp extends StatelessWidget {
     return BlocProvider(
       create: (_) => getIt<CarBloc>()..add(LoadCars()),
       child: MaterialApp(
+        useInheritedMediaQuery: true,
+        locale: DevicePreview.locale(context),
+        builder: DevicePreview.appBuilder,
         navigatorKey: navigatorKey,
         debugShowCheckedModeBanner: false,
         title: 'Car Rental App',
