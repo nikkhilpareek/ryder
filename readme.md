@@ -1,6 +1,7 @@
-# Ryder - A Digital Approach to Car Rental
+<h1 align="center" id="title">Ryder - Car Rental Made Easy</h1>
 
-A modern Flutter application for renting cars in India, featuring an intuitive UI, interactive maps, real-time car availability, and seamless booking experience.
+![ryder](https://socialify.git.ci/nikkhilpareek/ryder/image?custom_description=A+modern+Flutter+application+for+renting+cars+in+India%2C+featuring+an+intuitive+UI%2C+interactive+maps%2C+real-time+car+availability%2C+and+seamless+booking+experience.&custom_language=Dart&description=1&font=Jost&language=1&name=1&owner=1&pattern=Solid&theme=Auto)
+
 ## Screenshots
 
 | Car List Screen                      | Car Details Screen                | Booking Screen                  | Map Screen                     |
